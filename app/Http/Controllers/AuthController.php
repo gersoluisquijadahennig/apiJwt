@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -19,7 +20,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register','refresh']]);
+        $this->middleware('api', ['except' => ['login','register','refresh']]);
     }
 
     /**
@@ -59,6 +60,10 @@ class AuthController extends Controller
         return response()->json(Auth::user());
     }
 
+    public function verify(){
+        return response()->json(['message' => 'Token is valid']);
+    }
+
     /**
      * Log the user out (Invalidate the token).
      *
@@ -66,15 +71,9 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        Auth::logout();
-        // delete cookie
+        //Auth::logout();
+        //JWTAuth::invalidate(JWTAuth::getToken());  // Invalidar el token actual
         $cookie = cookie()->forget('access_token');  // Eliminar la cookie con el token
-
-        // delete cookie from the browser
-        setcookie('access_token', '', time() - 3600);  // Eliminar la cookie con el token
-
-
-
         return response()->json(['message' => 'Successfully logged out'])->withCookie($cookie);
     }
 

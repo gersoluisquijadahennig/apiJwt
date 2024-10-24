@@ -10,7 +10,8 @@ Route::post('/register', [AuthController::class, 'register']);
 // Ruta de inicio de sesión
 Route::post('/login', [AuthController::class, 'login'])->middleware(['EncryptCookies' ]);
 Route::get('/me', [AuthController::class, 'me'])->middleware(['EncryptCookies','JwtCookie' ]);
-Route::post('/logout', [AuthController::class, 'logout']);
+Route::get('/verify', [AuthController::class, 'verify'])->middleware(['EncryptCookies','JwtCookie' ]);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware(['EncryptCookies','JwtCookie' ]);
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
 

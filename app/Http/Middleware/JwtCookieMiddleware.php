@@ -42,9 +42,13 @@ class JwtCookieMiddleware
                 $refreshToken = JWTAuth::refresh($token);
 
                 // Actualizar la cookie con el nuevo token
-                $cookie = cookie('access_token', $refreshToken); // Establecer la cookie para 1 día (ajusta según tus necesidades)
+                $cookie = cookie('access_token', $refreshToken);
+                $user = JWTAuth::setToken($refreshToken)->authenticate();
                 
-                return response()->json(['access_token' => $refreshToken], Response::HTTP_OK)->cookie($cookie);
+                $response = $next($request);
+
+                // Añadir la cookie y la cabecera a la respuesta
+                return $response->cookie($cookie);
             } catch (Exception $e) {
                 return response()->json(['error' => 'Token refresh failed.'], Response::HTTP_UNAUTHORIZED);
             }
