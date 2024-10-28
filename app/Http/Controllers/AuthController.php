@@ -20,7 +20,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('api', ['except' => ['login','register','refresh']]);
+        //$this->middleware('api', ['except' => ['login','register','refresh']]);
     }
 
     /**
@@ -77,6 +77,12 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out'])->withCookie($cookie);
     }
 
+    public function logoutRefresh()
+    {
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
     /**
      * Refresh a token.
      *
@@ -85,7 +91,7 @@ class AuthController extends Controller
     public function refresh()
     {
         try {
-            return $this->respondWithToken(Auth::refresh());
+            return $this->respondWithTokenRefresh(Auth::refresh(true,true));
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json(['error' => 'Token has expired'], 401);
         } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
@@ -112,7 +118,18 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL() * 60
-        ])->cookie($cookie); // Agregar la cookie a la respuesta
+        ])->withCookie($cookie);
+    }
+
+    protected function respondWithTokenRefresh($token)
+    {
+        $cookie = cookie('access_token', $token); // Crear la cookie con el token
+    
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => Auth::factory()->getTTL() * 60
+        ]);
     }
 
     public function register(Request $request)

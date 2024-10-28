@@ -26,7 +26,7 @@ class JwtCookieMiddleware
             $token = $request->cookie('access_token'); // Asegúrate de que el nombre coincide con tu cookie
 
             if (!$token) {
-                return response()->json(['error' => 'Token not provided.'], Response::HTTP_UNAUTHORIZED);
+                return response()->json(['error' => 'Token not provided., user not authenticate'], Response::HTTP_UNAUTHORIZED);
             }
 
             // Intentar autenticar usando el token
